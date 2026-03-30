@@ -20,7 +20,7 @@ function ReviewPageContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
   const pollCount = useRef(0);
-  const pollTimer = useRef<ReturnType<typeof setInterval>>();
+  const pollTimer = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   // Load job info (for new review)
   useEffect(() => {

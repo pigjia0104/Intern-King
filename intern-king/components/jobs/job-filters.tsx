@@ -38,14 +38,14 @@ export function JobFiltersBar({ filters, onChange }: Props) {
         <Input
           placeholder="搜索公司或岗位..."
           className="pl-9"
-          value={filters.search || ""}
+          value={filters.search ?? ""}
           onChange={(e) => onChange({ ...filters, search: e.target.value, page: 1 })}
         />
       </div>
 
       <Select
-        value={filters.location || ""}
-        onValueChange={(v) => onChange({ ...filters, location: v === "全部" ? "" : v, page: 1 })}
+        value={filters.location ?? ""}
+        onValueChange={(v) => onChange({ ...filters, location: (v === "全部" || v === null) ? "" : (v ?? ""), page: 1 })}
       >
         <SelectTrigger className="w-[130px]">
           <SelectValue placeholder="地点" />
@@ -58,8 +58,8 @@ export function JobFiltersBar({ filters, onChange }: Props) {
       </Select>
 
       <Select
-        value={filters.type || ""}
-        onValueChange={(v) => onChange({ ...filters, type: v, page: 1 })}
+        value={filters.type ?? ""}
+        onValueChange={(v) => onChange({ ...filters, type: v ?? "", page: 1 })}
       >
         <SelectTrigger className="w-[130px]">
           <SelectValue placeholder="类型" />
@@ -72,8 +72,8 @@ export function JobFiltersBar({ filters, onChange }: Props) {
       </Select>
 
       <Select
-        value={filters.category || ""}
-        onValueChange={(v) => onChange({ ...filters, category: v, page: 1 })}
+        value={filters.category ?? ""}
+        onValueChange={(v) => onChange({ ...filters, category: v ?? "", page: 1 })}
       >
         <SelectTrigger className="w-[130px]">
           <SelectValue placeholder="方向" />

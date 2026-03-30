@@ -68,7 +68,7 @@ export function ReviewInput({ job, onSubmit, isProcessing }: Props) {
         <div>
           <label className="text-sm font-medium mb-2 block">选择简历</label>
           {resumes.length > 0 ? (
-            <Select value={selectedResume} onValueChange={setSelectedResume}>
+            <Select value={selectedResume} onValueChange={(v) => setSelectedResume(v ?? "")}>
               <SelectTrigger>
                 <SelectValue placeholder="选择一份简历" />
               </SelectTrigger>

@@ -50,12 +50,14 @@ export function UploadResumeDialog({ onUploaded }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-flame hover:bg-flame-600">
-          <Upload className="h-4 w-4 mr-2" />
-          上传简历
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button className="bg-flame hover:bg-flame-600">
+            <Upload className="h-4 w-4 mr-2" />
+            上传简历
+          </Button>
+        }
+      />
       <DialogContent>
         <DialogHeader>
           <DialogTitle>上传简历</DialogTitle>
