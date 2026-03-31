@@ -34,6 +34,10 @@ yarn-error.log*
 .env*
 !.env.example
 
+# AI prompt files (local only)
+CLAUDE.md
+AGENTS.md
+
 # vercel
 .vercel
 
