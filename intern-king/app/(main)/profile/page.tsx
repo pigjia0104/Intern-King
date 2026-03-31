@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useUser } from "@clerk/nextjs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -12,7 +11,6 @@ import { ResumeItem, ReviewItem, UserProfile } from "@/types";
 import { FileText, Star, FileSearch } from "lucide-react";
 
 export default function ProfilePage() {
-  const { user: clerkUser } = useUser();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [resumes, setResumes] = useState<ResumeItem[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
@@ -67,7 +65,7 @@ export default function ProfilePage() {
       <Card className="bg-card border-border mb-6">
         <CardContent className="pt-6 flex items-center gap-4">
           <Avatar className="h-16 w-16">
-            <AvatarImage src={clerkUser?.imageUrl} />
+            <AvatarImage src={profile?.avatarUrl || undefined} />
             <AvatarFallback className="bg-flame/10 text-flame text-lg">
               {profile?.name?.[0] || profile?.email?.[0] || "U"}
             </AvatarFallback>

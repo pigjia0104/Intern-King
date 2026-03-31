@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
-import { Briefcase, FileSearch, User, Flame } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Briefcase, FileSearch, User, Flame, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const navItems = [
   { href: "/jobs", label: "实习广场", icon: Briefcase },
@@ -14,6 +14,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r border-border bg-card">
@@ -45,13 +46,20 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* User button */}
+      {/* Logout button */}
       <div className="px-6 py-4 border-t border-border">
-        <UserButton
-          appearance={{
-            elements: { avatarBox: "h-8 w-8" },
+        <button
+          onClick={async () => {
+            const supabase = createSupabaseBrowserClient();
+            await supabase.auth.signOut();
+            router.push("/sign-in");
+            router.refresh();
           }}
-        />
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <LogOut className="h-4 w-4" />
+          退出登录
+        </button>
       </div>
     </aside>
   );
