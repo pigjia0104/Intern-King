@@ -47,16 +47,31 @@ export default function JobsPage() {
   };
 
   const toggleFavorite = async (jobId: string, isFavorited: boolean) => {
-    if (isFavorited) {
-      await fetch(`/api/favorites/${jobId}`, { method: "DELETE" });
-    } else {
-      await fetch("/api/favorites", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobId }),
-      });
+    // Optimistic update: immediately reflect in UI
+    setJobs((prev) =>
+      prev.map((job) =>
+        job.id === jobId ? { ...job, isFavorited: !isFavorited } : job
+      )
+    );
+
+    try {
+      if (isFavorited) {
+        await fetch(`/api/favorites/${jobId}`, { method: "DELETE" });
+      } else {
+        await fetch("/api/favorites", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jobId }),
+        });
+      }
+    } catch {
+      // Revert on failure
+      setJobs((prev) =>
+        prev.map((job) =>
+          job.id === jobId ? { ...job, isFavorited } : job
+        )
+      );
     }
-    fetchJobs();
   };
 
   const totalPages = Math.ceil(total / (filters.pageSize || 20));
