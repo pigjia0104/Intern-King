@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
       data: { userId: user.id, fileName: file.name, fileUrl, fileType },
     });
     return apiSuccess(resume, 201);
-  } catch {
+  } catch (e) {
+    console.error("[Resume Upload Error]", e);
     return apiError("INTERNAL", "上传失败", 500);
   }
 }

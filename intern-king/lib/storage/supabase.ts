@@ -10,7 +10,9 @@ const BUCKET = "resumes";
 export async function uploadFile(
   userId: string, fileName: string, file: Buffer, contentType: string
 ): Promise<string> {
-  const path = `${userId}/${Date.now()}-${fileName}`;
+  const ext = fileName.split(".").pop() || "";
+  const safeName = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
+  const path = `${userId}/${safeName}`;
   const { error } = await supabase.storage
     .from(BUCKET).upload(path, file, { contentType, upsert: false });
   if (error) throw new Error(`Upload failed: ${error.message}`);
