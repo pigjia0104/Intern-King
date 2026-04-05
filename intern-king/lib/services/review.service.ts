@@ -61,7 +61,8 @@ export async function processReview(reviewId: string): Promise<void> {
     let resumeText: string;
     try {
       resumeText = await getResumeText(review.resumeId);
-    } catch {
+    } catch (e) {
+      console.error("[Resume Parse Error]", e);
       throw new Error("简历格式无法识别，请上传标准 PDF/Word");
     }
 

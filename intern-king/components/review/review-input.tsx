@@ -70,7 +70,9 @@ export function ReviewInput({ job, onSubmit, isProcessing }: Props) {
           {resumes.length > 0 ? (
             <Select value={selectedResume} onValueChange={(v) => setSelectedResume(v ?? "")}>
               <SelectTrigger>
-                <SelectValue placeholder="选择一份简历" />
+                <SelectValue placeholder="选择一份简历">
+                  {resumes.find((r) => r.id === selectedResume)?.fileName}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {resumes.map((r) => (
