@@ -1,44 +1,49 @@
-/*
-  Warnings:
+-- Step 1: Add new columns to Review as NULLABLE first
+ALTER TABLE "Review" ADD COLUMN "company" TEXT;
+ALTER TABLE "Review" ADD COLUMN "position" TEXT;
+ALTER TABLE "Review" ADD COLUMN "jobDescription" TEXT;
+ALTER TABLE "Review" ADD COLUMN "category" TEXT;
+ALTER TABLE "Review" ADD COLUMN "type" TEXT;
 
-  - You are about to drop the column `jobId` on the `Favorite` table. All the data in the column will be lost.
-  - You are about to drop the column `jobId` on the `Review` table. All the data in the column will be lost.
-  - You are about to drop the `Job` table. If the table is not empty, all the data it contains will be lost.
-  - A unique constraint covering the columns `[userId,companyId]` on the table `Favorite` will be added. If there are existing duplicate values, this will fail.
-  - Added the required column `companyId` to the `Favorite` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `company` to the `Review` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `jobDescription` to the `Review` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `position` to the `Review` table without a default value. This is not possible if the table is not empty.
+-- Step 2: Backfill from Job table
+UPDATE "Review" SET
+  "company" = "Job"."company",
+  "position" = "Job"."title",
+  "jobDescription" = "Job"."description"
+FROM "Job"
+WHERE "Review"."jobId" = "Job"."id";
 
-*/
--- DropForeignKey
-ALTER TABLE "Favorite" DROP CONSTRAINT "Favorite_jobId_fkey";
+-- Step 3: Fill any orphaned reviews (jobId points to deleted Job)
+UPDATE "Review" SET
+  "company" = '未知公司',
+  "position" = '未知岗位',
+  "jobDescription" = '无'
+WHERE "company" IS NULL;
 
--- DropForeignKey
+-- Step 4: Now make them NOT NULL
+ALTER TABLE "Review" ALTER COLUMN "company" SET NOT NULL;
+ALTER TABLE "Review" ALTER COLUMN "position" SET NOT NULL;
+ALTER TABLE "Review" ALTER COLUMN "jobDescription" SET NOT NULL;
+
+-- Step 5: Drop old Review foreign key and index
 ALTER TABLE "Review" DROP CONSTRAINT "Review_jobId_fkey";
+DROP INDEX "Review_jobId_idx";
+ALTER TABLE "Review" DROP COLUMN "jobId";
 
--- DropIndex
+-- Step 6: Drop old Favorite foreign key and recreate with companyId
+ALTER TABLE "Favorite" DROP CONSTRAINT "Favorite_jobId_fkey";
 DROP INDEX "Favorite_userId_jobId_key";
 
--- DropIndex
-DROP INDEX "Review_jobId_idx";
+-- Clear old favorites (they reference jobs, not companies)
+DELETE FROM "Favorite";
 
--- AlterTable
-ALTER TABLE "Favorite" DROP COLUMN "jobId",
-ADD COLUMN     "companyId" TEXT NOT NULL;
+ALTER TABLE "Favorite" DROP COLUMN "jobId";
+ALTER TABLE "Favorite" ADD COLUMN "companyId" TEXT NOT NULL;
 
--- AlterTable
-ALTER TABLE "Review" DROP COLUMN "jobId",
-ADD COLUMN     "category" TEXT,
-ADD COLUMN     "company" TEXT NOT NULL,
-ADD COLUMN     "jobDescription" TEXT NOT NULL,
-ADD COLUMN     "position" TEXT NOT NULL,
-ADD COLUMN     "type" TEXT;
-
--- DropTable
+-- Step 7: Drop Job table
 DROP TABLE "Job";
 
--- CreateTable
+-- Step 8: Create Company table
 CREATE TABLE "Company" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -54,14 +59,10 @@ CREATE TABLE "Company" (
     CONSTRAINT "Company_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
+-- Step 9: Create indexes and constraints
 CREATE UNIQUE INDEX "Company_name_key" ON "Company"("name");
-
--- CreateIndex
 CREATE INDEX "Company_name_idx" ON "Company"("name");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Favorite_userId_companyId_key" ON "Favorite"("userId", "companyId");
 
--- AddForeignKey
+-- Step 10: Add foreign key for Favorite -> Company
 ALTER TABLE "Favorite" ADD CONSTRAINT "Favorite_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
