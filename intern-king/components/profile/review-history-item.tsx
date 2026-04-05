@@ -34,7 +34,7 @@ export function ReviewHistoryItem({ review }: Props) {
 
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium">
-          {review.jobCompany} · {review.jobTitle}
+          {review.company} · {review.position}
         </p>
         <p className="text-xs text-muted-foreground mt-1">
           {review.resumeFileName} · {new Date(review.createdAt).toLocaleDateString("zh-CN")}

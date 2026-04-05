@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { getCurrentUser } from "@/lib/utils/auth";
-import { getJobs } from "@/lib/services/job.service";
+import { getCompanies } from "@/lib/services/company.service";
 import { apiList, apiError } from "@/lib/utils/api";
 
 export async function GET(req: NextRequest) {
@@ -11,15 +11,15 @@ export async function GET(req: NextRequest) {
     const filters = {
       search: params.get("search") || undefined,
       location: params.get("location") || undefined,
-      type: params.get("type") || undefined,
       category: params.get("category") || undefined,
+      type: params.get("type") || undefined,
       page: Number(params.get("page")) || 1,
       pageSize: Math.min(Number(params.get("pageSize")) || 20, 100),
     };
 
-    const result = await getJobs(filters, user?.id);
+    const result = await getCompanies(filters, user?.id);
     return apiList(result.data, result.pagination);
   } catch {
-    return apiError("INTERNAL", "获取岗位列表失败", 500);
+    return apiError("INTERNAL", "获取公司列表失败", 500);
   }
 }

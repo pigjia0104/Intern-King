@@ -22,17 +22,24 @@ export interface ApiError {
 
 // ===== Domain Types =====
 
-export interface JobItem {
+export interface CompanyItem {
   id: string;
-  company: string;
-  title: string;
-  type: string;
-  location: string;
-  category: string;
-  description: string;
-  applyUrl: string | null;
-  publishedAt: string | null;
+  name: string;
+  abbr: string;
+  categories: string[];
+  locations: string[];
+  types: string[];
+  careerUrl: string;
   isFavorited: boolean;
+}
+
+export interface CompanyFilters {
+  search?: string;
+  location?: string;
+  category?: string;
+  type?: string;
+  page?: number;
+  pageSize?: number;
 }
 
 export interface ResumeItem {
@@ -46,8 +53,8 @@ export interface ReviewItem {
   id: string;
   status: "pending" | "processing" | "completed" | "failed";
   score: number | null;
-  jobTitle: string;
-  jobCompany: string;
+  company: string;
+  position: string;
   resumeFileName: string;
   createdAt: string;
 }
@@ -75,7 +82,8 @@ export interface ReviewDetail {
   content: ReviewResult | null;
   errorMessage: string | null;
   createdAt: string;
-  job: { company: string; title: string; type: string; location: string };
+  company: string;
+  position: string;
   resume: { fileName: string };
 }
 
@@ -93,11 +101,3 @@ export interface UserProfile {
 
 // ===== Filter Types =====
 
-export interface JobFilters {
-  search?: string;
-  location?: string;
-  type?: string;
-  category?: string;
-  page?: number;
-  pageSize?: number;
-}

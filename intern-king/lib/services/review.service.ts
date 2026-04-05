@@ -28,18 +28,35 @@ export async function checkConcurrencyLock(userId: string): Promise<boolean> {
   return active !== null;
 }
 
-export async function createReview(userId: string, jobId: string, resumeId: string) {
-  // Validate job and resume exist
-  const [job, resume] = await Promise.all([
-    prisma.job.findUnique({ where: { id: jobId } }),
-    prisma.resume.findFirst({ where: { id: resumeId, userId } }),
-  ]);
+export async function createReview(
+  userId: string,
+  data: {
+    company: string;
+    position: string;
+    jobDescription: string;
+    resumeId: string;
+    category?: string;
+    type?: string;
+  }
+) {
+  // Validate resume exists
+  const resume = await prisma.resume.findFirst({
+    where: { id: data.resumeId, userId },
+  });
 
-  if (!job) throw new Error("JOB_NOT_FOUND");
   if (!resume) throw new Error("RESUME_NOT_FOUND");
 
   return prisma.review.create({
-    data: { userId, jobId, resumeId, status: "pending" },
+    data: {
+      userId,
+      resumeId: data.resumeId,
+      company: data.company,
+      position: data.position,
+      jobDescription: data.jobDescription,
+      category: data.category,
+      type: data.type,
+      status: "pending",
+    },
   });
 }
 
@@ -53,7 +70,7 @@ export async function processReview(reviewId: string): Promise<void> {
 
     const review = await prisma.review.findUnique({
       where: { id: reviewId },
-      include: { job: true, resume: true },
+      include: { resume: true },
     });
     if (!review) throw new Error("Review not found");
 
@@ -68,10 +85,10 @@ export async function processReview(reviewId: string): Promise<void> {
 
     // Step 2 + 2.5: Search + filter interview experiences
     const searchContext = await searchAndFilterExperiences({
-      company: review.job.company,
-      title: review.job.title,
-      type: review.job.type,
-      category: review.job.category,
+      company: review.company,
+      title: review.position,
+      type: review.type || '',
+      category: review.category || '',
     });
 
     // Save search context for traceability
@@ -83,11 +100,11 @@ export async function processReview(reviewId: string): Promise<void> {
     // Step 3: Build prompt and call DeepSeek
     const prompt = buildReviewPrompt(
       {
-        company: review.job.company,
-        title: review.job.title,
-        type: review.job.type,
-        location: review.job.location,
-        description: review.job.description,
+        company: review.company,
+        title: review.position,
+        type: review.type || '',
+        location: '',
+        description: review.jobDescription,
       },
       searchContext,
       resumeText
@@ -136,7 +153,6 @@ export async function getReviewById(id: string, userId: string) {
   const review = await prisma.review.findFirst({
     where: { id, userId },
     include: {
-      job: { select: { company: true, title: true, type: true, location: true } },
       resume: { select: { fileName: true } },
     },
   });
@@ -150,7 +166,8 @@ export async function getReviewById(id: string, userId: string) {
     content: review.content ? JSON.parse(review.content) : null,
     errorMessage: review.errorMessage,
     createdAt: review.createdAt.toISOString(),
-    job: review.job,
+    company: review.company,
+    position: review.position,
     resume: review.resume,
   };
 }
@@ -158,11 +175,9 @@ export async function getReviewById(id: string, userId: string) {
 export async function getReviewList(
   userId: string,
   page = 1,
-  pageSize = 20,
-  jobId?: string
+  pageSize = 20
 ) {
   const where: Record<string, unknown> = { userId };
-  if (jobId) where.jobId = jobId;
 
   const [reviews, total] = await Promise.all([
     prisma.review.findMany({
@@ -171,7 +186,6 @@ export async function getReviewList(
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        job: { select: { company: true, title: true } },
         resume: { select: { fileName: true } },
       },
     }),
@@ -182,8 +196,8 @@ export async function getReviewList(
     id: r.id,
     status: r.status,
     score: r.score,
-    jobTitle: r.job.title,
-    jobCompany: r.job.company,
+    company: r.company,
+    position: r.position,
     resumeFileName: r.resume.fileName,
     createdAt: r.createdAt.toISOString(),
   }));

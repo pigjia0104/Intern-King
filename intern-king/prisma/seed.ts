@@ -6,147 +6,61 @@ const adapter = new PrismaPg({
 });
 const prisma = new PrismaClient({ adapter });
 
-const jobs = [
-  {
-    company: "腾讯",
-    title: "前端开发实习生",
-    type: "summer",
-    location: "深圳,北京",
-    category: "研发",
-    description:
-      "负责腾讯产品的前端开发工作，使用 React/Vue 技术栈。要求：熟悉 HTML/CSS/JavaScript，了解至少一种前端框架，有 TypeScript 经验加分。实习时间不少于 3 个月。",
-    applyUrl: "https://join.qq.com",
-    source: "manual",
-    publishedAt: new Date(),
-  },
-  {
-    company: "阿里巴巴",
-    title: "Java 后端开发实习生",
-    type: "summer",
-    location: "杭州,北京",
-    category: "研发",
-    description:
-      "参与阿里核心业务系统后端开发。要求：熟悉 Java 编程，了解 Spring Boot 框架，熟悉 MySQL 等关系型数据库，了解分布式系统基本概念。",
-    applyUrl: "https://talent.alibaba.com",
-    source: "manual",
-    publishedAt: new Date(),
-  },
-  {
-    company: "字节跳动",
-    title: "产品经理实习生",
-    type: "summer",
-    location: "北京,上海",
-    category: "产品",
-    description:
-      "参与抖音/飞书等产品的需求分析和产品设计。要求：逻辑思维清晰，有用户思维，熟悉常用产品分析工具，有产品设计或运营相关经验优先。",
-    applyUrl: "https://jobs.bytedance.com",
-    source: "manual",
-    publishedAt: new Date(),
-  },
-  {
-    company: "美团",
-    title: "数据分析实习生",
-    type: "daily",
-    location: "北京,上海",
-    category: "研发",
-    description:
-      "负责业务数据分析和报表搭建。要求：熟悉 SQL，了解 Python/R 等数据分析工具，有统计学基础，能独立完成数据分析项目。",
-    applyUrl: "https://zhaopin.meituan.com",
-    source: "manual",
-    publishedAt: new Date(),
-  },
-  {
-    company: "小红书",
-    title: "运营实习生",
-    type: "daily",
-    location: "上海",
-    category: "运营",
-    description:
-      "负责社区内容运营，包括话题策划、内容审核、数据复盘。要求：熟悉小红书平台，有内容创作或社区运营经验，对美妆/时尚/生活方式感兴趣。",
-    applyUrl: "https://job.xiaohongshu.com",
-    source: "manual",
-    publishedAt: new Date(),
-  },
-  {
-    company: "网易",
-    title: "游戏策划实习生",
-    type: "summer",
-    location: "广州,杭州",
-    category: "产品",
-    description:
-      "参与网易游戏的关卡设计和数值策划。要求：热爱游戏，有丰富的游戏经验，逻辑思维强，有游戏策划案或 Mod 制作经验优先。",
-    applyUrl: "https://hr.163.com",
-    source: "manual",
-    publishedAt: new Date(),
-  },
-  {
-    company: "华为",
-    title: "C++ 开发实习生",
-    type: "summer",
-    location: "深圳,成都,南京",
-    category: "研发",
-    description:
-      "参与华为终端/云计算产品的 C++ 开发。要求：扎实的 C/C++ 基础，了解数据结构与算法，熟悉 Linux 开发环境，有系统编程经验优先。",
-    applyUrl: "https://career.huawei.com",
-    source: "manual",
-    publishedAt: new Date(),
-  },
-  {
-    company: "京东",
-    title: "UI 设计实习生",
-    type: "daily",
-    location: "北京",
-    category: "设计",
-    description:
-      "负责京东 App/Web 端的界面设计和交互优化。要求：熟练使用 Figma/Sketch，有完整的设计作品集，了解设计规范和组件化设计思维。",
-    applyUrl: "https://zhaopin.jd.com",
-    source: "manual",
-    publishedAt: new Date(),
-  },
-  {
-    company: "百度",
-    title: "算法工程师实习生",
-    type: "summer",
-    location: "北京,深圳",
-    category: "研发",
-    description:
-      "参与搜索/推荐/NLP 等方向的算法研发。要求：扎实的数学和统计学基础，熟悉 Python 和深度学习框架（PyTorch/TensorFlow），有论文发表或竞赛经验优先。",
-    applyUrl: "https://talent.baidu.com",
-    source: "manual",
-    publishedAt: new Date(),
-  },
-  {
-    company: "快手",
-    title: "测试开发实习生",
-    type: "daily",
-    location: "北京",
-    category: "研发",
-    description:
-      "负责快手产品的自动化测试框架搭建和维护。要求：熟悉 Python/Java，了解自动化测试框架，有测试开发经验优先。",
-    applyUrl: "https://zhaopin.kuaishou.cn",
-    source: "manual",
-    publishedAt: new Date(),
-  },
+const companies = [
+  { name: "腾讯", abbr: "TX", categories: ["后端", "前端", "算法", "产品", "数据", "测试", "游戏", "运营"], locations: ["深圳", "北京", "上海", "成都", "广州"], types: ["暑期实习", "日常实习"], careerUrl: "https://join.qq.com" },
+  { name: "阿里巴巴", abbr: "AL", categories: ["后端", "前端", "算法", "产品", "数据", "设计", "运营"], locations: ["杭州", "北京", "上海", "深圳", "广州"], types: ["暑期实习", "日常实习"], careerUrl: "https://talent.alibaba.com" },
+  { name: "字节跳动", abbr: "BD", categories: ["后端", "前端", "算法", "产品", "数据", "测试", "运营", "设计"], locations: ["北京", "上海", "深圳", "杭州", "成都", "广州"], types: ["暑期实习", "日常实习"], careerUrl: "https://jobs.bytedance.com" },
+  { name: "美团", abbr: "MT", categories: ["后端", "前端", "算法", "产品", "数据", "测试"], locations: ["北京", "上海", "成都"], types: ["暑期实习", "日常实习"], careerUrl: "https://zhaopin.meituan.com" },
+  { name: "京东", abbr: "JD", categories: ["后端", "前端", "算法", "产品", "数据", "测试", "运营"], locations: ["北京", "上海", "深圳", "成都", "武汉"], types: ["暑期实习", "日常实习"], careerUrl: "https://campus.jd.com" },
+  { name: "百度", abbr: "Bd", categories: ["后端", "前端", "算法", "产品", "数据", "测试"], locations: ["北京", "上海", "深圳"], types: ["暑期实习", "日常实习"], careerUrl: "https://talent.baidu.com" },
+  { name: "网易", abbr: "WY", categories: ["后端", "前端", "游戏", "产品", "设计", "运营"], locations: ["杭州", "广州", "北京", "上海"], types: ["暑期实习", "日常实习"], careerUrl: "https://campus.163.com" },
+  { name: "小红书", abbr: "XH", categories: ["后端", "前端", "算法", "产品", "数据", "设计", "运营"], locations: ["上海", "北京", "武汉"], types: ["暑期实习", "日常实习"], careerUrl: "https://job.xiaohongshu.com" },
+  { name: "快手", abbr: "KS", categories: ["后端", "前端", "算法", "产品", "数据", "测试"], locations: ["北京", "上海", "深圳", "杭州"], types: ["暑期实习", "日常实习"], careerUrl: "https://zhaopin.kuaishou.cn" },
+  { name: "华为", abbr: "HW", categories: ["后端", "算法", "硬件", "测试", "数据"], locations: ["深圳", "北京", "上海", "成都", "武汉", "西安", "南京"], types: ["暑期实习"], careerUrl: "https://career.huawei.com" },
+  { name: "bilibili", abbr: "B站", categories: ["后端", "前端", "算法", "产品", "运营", "设计", "游戏"], locations: ["上海", "北京", "杭州", "武汉", "成都"], types: ["暑期实习", "日常实习"], careerUrl: "https://jobs.bilibili.com" },
+  { name: "拼多多", abbr: "PD", categories: ["后端", "前端", "算法", "产品", "数据"], locations: ["上海", "北京", "广州"], types: ["暑期实习", "日常实习"], careerUrl: "https://careers.pinduoduo.com" },
+  { name: "滴滴", abbr: "DD", categories: ["后端", "前端", "算法", "产品", "数据", "测试"], locations: ["北京", "杭州", "上海"], types: ["暑期实习", "日常实习"], careerUrl: "https://talent.didiglobal.com" },
+  { name: "携程", abbr: "CT", categories: ["后端", "前端", "产品", "数据", "测试", "运营"], locations: ["上海", "北京", "南京", "成都"], types: ["暑期实习", "日常实习"], careerUrl: "https://campus.ctrip.com" },
+  { name: "商汤科技", abbr: "ST", categories: ["算法", "后端", "数据", "产品"], locations: ["北京", "上海", "深圳", "杭州"], types: ["暑期实习", "日常实习"], careerUrl: "https://hr.sensetime.com" },
+  { name: "大疆", abbr: "DJ", categories: ["算法", "后端", "硬件", "测试", "产品"], locations: ["深圳", "上海", "北京"], types: ["暑期实习", "日常实习"], careerUrl: "https://we.dji.com" },
+  { name: "蚂蚁集团", abbr: "MY", categories: ["后端", "前端", "算法", "产品", "数据", "测试"], locations: ["杭州", "北京", "上海", "成都"], types: ["暑期实习"], careerUrl: "https://talent.antgroup.com" },
+  { name: "微软中国", abbr: "MS", categories: ["后端", "前端", "算法", "产品", "数据", "测试"], locations: ["北京", "上海", "深圳", "苏州"], types: ["暑期实习", "日常实习"], careerUrl: "https://careers.microsoft.com" },
+  { name: "谷歌中国", abbr: "GG", categories: ["后端", "算法", "前端", "产品"], locations: ["北京", "上海"], types: ["暑期实习"], careerUrl: "https://careers.google.com" },
+  { name: "亚马逊中国", abbr: "AZ", categories: ["后端", "算法", "数据", "产品", "运营"], locations: ["北京", "上海", "深圳"], types: ["暑期实习", "日常实习"], careerUrl: "https://www.amazon.jobs" },
+  { name: "苹果中国", abbr: "AP", categories: ["后端", "算法", "硬件", "设计", "产品"], locations: ["北京", "上海", "深圳"], types: ["暑期实习"], careerUrl: "https://jobs.apple.com" },
+  { name: "英伟达中国", abbr: "NV", categories: ["算法", "后端", "硬件", "数据"], locations: ["北京", "上海", "深圳"], types: ["暑期实习", "日常实习"], careerUrl: "https://nvidia.wd5.myworkdayjobs.com" },
+  { name: "Intel中国", abbr: "IN", categories: ["后端", "算法", "硬件", "测试", "数据"], locations: ["北京", "上海", "成都", "大连"], types: ["暑期实习"], careerUrl: "https://jobs.intel.com" },
+  { name: "三星中国", abbr: "SS", categories: ["后端", "算法", "硬件", "测试"], locations: ["北京", "上海", "深圳", "西安"], types: ["暑期实习"], careerUrl: "https://www.samsung.com/cn/about-us/careers/" },
+  { name: "OPPO", abbr: "OP", categories: ["后端", "前端", "算法", "硬件", "测试", "设计"], locations: ["深圳", "北京", "上海", "成都"], types: ["暑期实习", "日常实习"], careerUrl: "https://careers.oppo.com" },
+  { name: "vivo", abbr: "Vi", categories: ["后端", "前端", "算法", "硬件", "测试"], locations: ["深圳", "北京", "上海", "南京", "东莞"], types: ["暑期实习", "日常实习"], careerUrl: "https://hr.vivo.com" },
+  { name: "小米", abbr: "Mi", categories: ["后端", "前端", "算法", "产品", "硬件", "测试", "设计"], locations: ["北京", "上海", "深圳", "南京", "武汉"], types: ["暑期实习", "日常实习"], careerUrl: "https://hr.xiaomi.com" },
+  { name: "联想", abbr: "LX", categories: ["后端", "算法", "硬件", "产品", "测试", "数据"], locations: ["北京", "上海", "深圳", "成都", "武汉"], types: ["暑期实习"], careerUrl: "https://talent.lenovo.com.cn" },
+  { name: "荣耀", abbr: "HR", categories: ["后端", "算法", "硬件", "测试", "产品"], locations: ["深圳", "北京", "上海", "西安", "成都"], types: ["暑期实习", "日常实习"], careerUrl: "https://career.hihonor.com" },
+  { name: "中兴", abbr: "ZX", categories: ["后端", "算法", "硬件", "测试"], locations: ["深圳", "上海", "南京", "西安", "成都"], types: ["暑期实习"], careerUrl: "https://job.zte.com.cn" },
+  { name: "米哈游", abbr: "MH", categories: ["后端", "前端", "游戏", "算法", "设计", "产品"], locations: ["上海", "北京", "深圳", "蒙特利尔"], types: ["暑期实习", "日常实习"], careerUrl: "https://join.mihoyo.com" },
+  { name: "蔚来", abbr: "NI", categories: ["后端", "算法", "硬件", "数据", "产品", "测试"], locations: ["上海", "北京", "合肥", "深圳"], types: ["暑期实习", "日常实习"], careerUrl: "https://nio.jobs.feishu.cn" },
+  { name: "理想汽车", abbr: "理", categories: ["后端", "算法", "硬件", "数据", "测试"], locations: ["北京", "上海", "成都", "常州"], types: ["暑期实习", "日常实习"], careerUrl: "https://www.lixiang.com/employ" },
+  { name: "小鹏汽车", abbr: "XP", categories: ["后端", "算法", "硬件", "数据", "测试", "产品"], locations: ["广州", "北京", "上海", "深圳"], types: ["暑期实习", "日常实习"], careerUrl: "https://job.xpeng.com" },
+  { name: "度小满", abbr: "DX", categories: ["后端", "前端", "算法", "数据", "产品", "测试"], locations: ["北京", "上海", "深圳"], types: ["暑期实习", "日常实习"], careerUrl: "https://campus.duxiaoman.com" },
+  { name: "旷视科技", abbr: "旷", categories: ["算法", "后端", "数据", "产品"], locations: ["北京", "上海", "南京"], types: ["暑期实习", "日常实习"], careerUrl: "https://job.megvii.com" },
+  { name: "深信服", abbr: "SF", categories: ["后端", "前端", "算法", "测试", "产品"], locations: ["深圳", "北京", "上海", "成都", "长沙"], types: ["暑期实习", "日常实习"], careerUrl: "https://hr.sangfor.com" },
+  { name: "海康威视", abbr: "HK", categories: ["后端", "算法", "硬件", "测试", "数据"], locations: ["杭州", "北京", "上海", "深圳", "武汉"], types: ["暑期实习"], careerUrl: "https://campushr.hikvision.com" },
+  { name: "科大讯飞", abbr: "KD", categories: ["算法", "后端", "数据", "产品", "测试"], locations: ["合肥", "北京", "上海", "深圳"], types: ["暑期实习", "日常实习"], careerUrl: "https://campus.iflytek.com" },
+  { name: "汇量科技", abbr: "MB", categories: ["后端", "前端", "数据", "算法", "产品"], locations: ["广州", "北京", "上海"], types: ["暑期实习", "日常实习"], careerUrl: "https://www.mobvista.com/cn/career/" },
 ];
 
 async function main() {
-  console.log("Seeding jobs...");
+  console.log("Seeding companies...");
 
-  for (const job of jobs) {
-    const id = `seed-${job.company}-${job.title}`
-      .replace(/\s+/g, "-")
-      .toLowerCase();
-    await prisma.job.upsert({
-      where: { id },
-      update: job,
-      create: {
-        id,
-        ...job,
-      },
+  for (const company of companies) {
+    await prisma.company.upsert({
+      where: { name: company.name },
+      update: company,
+      create: company,
     });
   }
 
-  console.log(`Seeded ${jobs.length} jobs`);
+  console.log(`Seeded ${companies.length} companies`);
 }
 
 main()

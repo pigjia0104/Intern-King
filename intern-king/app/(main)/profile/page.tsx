@@ -14,7 +14,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [resumes, setResumes] = useState<ResumeItem[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
-  const [favorites, setFavorites] = useState<Array<{ id: string; company: string; title: string }>>([]);
+  const [favorites, setFavorites] = useState<Array<{ id: string; name: string; abbr: string; categories?: string[] }>>([]);
 
   const loadProfile = useCallback(async () => {
     const res = await fetch("/api/user/profile");
@@ -128,11 +128,12 @@ export default function ProfilePage() {
         <TabsContent value="favorites">
           <div className="grid gap-3">
             {favorites.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">还没有收藏岗位</p>
+              <p className="text-sm text-muted-foreground py-8 text-center">还没有收藏公司</p>
             ) : (
               favorites.map((f) => (
                 <div key={f.id} className="p-4 rounded-lg border border-border">
-                  <p className="text-sm font-medium">{f.company} · {f.title}</p>
+                  <p className="text-sm font-medium">{f.name}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{f.categories?.join("、")}</p>
                 </div>
               ))
             )}

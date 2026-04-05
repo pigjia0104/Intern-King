@@ -5,12 +5,12 @@ import { apiSuccess, apiError } from "@/lib/utils/api";
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: Promise<{ jobId: string }> }
+  { params }: { params: Promise<{ companyId: string }> }
 ) {
   try {
     const user = await requireUser();
-    const { jobId } = await params;
-    await removeFavorite(user.id, jobId);
+    const { companyId } = await params;
+    await removeFavorite(user.id, companyId);
     return apiSuccess({ success: true });
   } catch {
     return apiError("INTERNAL", "取消收藏失败", 500);

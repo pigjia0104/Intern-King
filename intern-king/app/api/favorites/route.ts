@@ -19,13 +19,13 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const user = await requireUser();
-    const { jobId } = await req.json();
-    if (!jobId) return apiError("VALIDATION", "缺少 jobId", 400);
-    const favorite = await addFavorite(user.id, jobId);
+    const { companyId } = await req.json();
+    if (!companyId) return apiError("VALIDATION", "缺少 companyId", 400);
+    const favorite = await addFavorite(user.id, companyId);
     return apiSuccess(favorite, 201);
   } catch (err: unknown) {
     if (err instanceof Error && err.message.includes("Unique constraint")) {
-      return apiError("CONFLICT", "已收藏该岗位", 409);
+      return apiError("CONFLICT", "已收藏该公司", 409);
     }
     return apiError("INTERNAL", "收藏失败", 500);
   }

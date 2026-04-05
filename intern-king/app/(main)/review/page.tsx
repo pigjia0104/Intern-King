@@ -12,26 +12,13 @@ const MAX_POLLS = 60;
 
 function ReviewPageContent() {
   const searchParams = useSearchParams();
-  const jobId = searchParams.get("jobId");
   const reviewId = searchParams.get("reviewId");
 
-  const [job, setJob] = useState<{ id: string; company: string; title: string; type: string; location: string } | null>(null);
   const [reviewData, setReviewData] = useState<ReviewDetail | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
   const pollCount = useRef(0);
   const pollTimer = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
-
-  // Load job info (for new review)
-  useEffect(() => {
-    if (jobId) {
-      fetch(`/api/jobs/${jobId}`)
-        .then((r) => r.json())
-        .then((json) => {
-          if (json.data) setJob(json.data);
-        });
-    }
-  }, [jobId]);
 
   // Load existing review (from history)
   useEffect(() => {
@@ -41,7 +28,6 @@ function ReviewPageContent() {
         .then((json) => {
           if (json.data) {
             setReviewData(json.data);
-            if (json.data.job) setJob({ id: "", ...json.data.job });
           }
         });
     }
@@ -81,7 +67,7 @@ function ReviewPageContent() {
     };
   }, []);
 
-  const handleSubmit = async (jobId: string, resumeId: string) => {
+  const handleSubmit = async (data: { company: string; position: string; jobDescription: string; resumeId: string; category?: string; type?: string }) => {
     setError("");
     setReviewData(null);
     setIsProcessing(true);
@@ -91,7 +77,7 @@ function ReviewPageContent() {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobId, resumeId }),
+        body: JSON.stringify(data),
       });
 
       const json = await res.json();
@@ -111,12 +97,14 @@ function ReviewPageContent() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">AI 简历锐评</h1>
+      <h1 className="text-2xl font-bold mb-6">
+        AI <span className="text-flame">锐评</span>
+      </h1>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Left: Input Panel */}
         <div>
-          <ReviewInput job={job} onSubmit={handleSubmit} isProcessing={isProcessing} />
+          <ReviewInput onSubmit={handleSubmit} isProcessing={isProcessing} />
         </div>
 
         {/* Right: Result Panel */}

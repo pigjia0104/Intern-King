@@ -8,10 +8,10 @@ export async function getFavorites(userId: string, page = 1, pageSize = 20) {
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        job: {
+        company: {
           select: {
-            id: true, company: true, title: true,
-            type: true, location: true, category: true,
+            id: true, name: true, abbr: true,
+            categories: true, locations: true, types: true, careerUrl: true,
           },
         },
       },
@@ -19,15 +19,15 @@ export async function getFavorites(userId: string, page = 1, pageSize = 20) {
     prisma.favorite.count({ where: { userId } }),
   ]);
   return {
-    data: favorites.map((f) => ({ ...f.job, favoritedAt: f.createdAt })),
+    data: favorites.map((f) => ({ ...f.company, favoritedAt: f.createdAt })),
     pagination: { page, pageSize, total },
   };
 }
 
-export async function addFavorite(userId: string, jobId: string) {
-  return prisma.favorite.create({ data: { userId, jobId } });
+export async function addFavorite(userId: string, companyId: string) {
+  return prisma.favorite.create({ data: { userId, companyId } });
 }
 
-export async function removeFavorite(userId: string, jobId: string) {
-  return prisma.favorite.deleteMany({ where: { userId, jobId } });
+export async function removeFavorite(userId: string, companyId: string) {
+  return prisma.favorite.deleteMany({ where: { userId, companyId } });
 }

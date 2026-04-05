@@ -37,58 +37,53 @@ model Resume {
   @@index([userId])
 }
 
-model Job {
-  id          String    @id @default(cuid())
-  company     String
-  title       String
-  type        String
-  location    String
-  category    String
-  description String    @db.Text
-  applyUrl    String?
-  source      String    @default("manual")
-  publishedAt DateTime?
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+model Company {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  abbr       String
+  categories String[]
+  locations  String[]
+  types      String[]
+  careerUrl  String
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   favorites Favorite[]
-  reviews   Review[]
 
-  @@index([company])
-  @@index([location])
-  @@index([category])
-  @@index([type])
+  @@index([name])
 }
 
 model Favorite {
   id        String   @id @default(cuid())
   userId    String
-  jobId     String
+  companyId String
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, jobId])
+  @@unique([userId, companyId])
 }
 
 model Review {
-  id            String   @id @default(cuid())
-  userId        String
-  jobId         String
-  resumeId      String
-  status        String   @default("pending")
-  score         Int?
-  content       String?  @db.Text
-  searchContext String?  @db.Text
-  errorMessage  String?
-  createdAt     DateTime @default(now())
+  id             String   @id @default(cuid())
+  userId         String
+  resumeId       String
+  company        String
+  position       String
+  jobDescription String   @db.Text
+  category       String?
+  type           String?
+  status         String   @default("pending")
+  score          Int?
+  content        String?  @db.Text
+  searchContext  String?  @db.Text
+  errorMessage   String?
+  createdAt      DateTime @default(now())
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job    Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
   resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([jobId])
 }
