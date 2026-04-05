@@ -19,10 +19,9 @@ export async function getResumeText(resumeId: string): Promise<string> {
   let text: string;
 
   if (resume.fileType === "pdf") {
-    const { PDFParse } = await import("pdf-parse");
-    const parser = new PDFParse({ data: buffer });
-    const result = await parser.getText();
-    text = result.text;
+    const { extractText } = await import("unpdf");
+    const result = await extractText(new Uint8Array(buffer), { mergePages: true });
+    text = result.text as string;
   } else if (resume.fileType === "docx") {
     const mammoth = await import("mammoth");
     const result = await mammoth.extractRawText({ buffer });

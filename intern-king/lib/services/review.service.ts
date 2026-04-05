@@ -107,7 +107,8 @@ export async function processReview(reviewId: string): Promise<void> {
         );
         result = parseJsonResponse<ReviewResult>(raw);
         break;
-      } catch {
+      } catch (e) {
+        console.error(`[DeepSeek Error] attempt ${retries + 1}:`, e);
         retries++;
         if (retries >= 2) throw new Error("AI 生成异常，请重试");
       }
