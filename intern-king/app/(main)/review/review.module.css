@@ -606,3 +606,41 @@
 .ctaActions :global(.ds-btn.ghost:hover) {
   background: rgba(255, 255, 255, 0.1);
 }
+
+@media (max-width: 720px) {
+  .ph {
+    align-items: flex-start;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+  }
+  .phTitle { font-size: 32px; }
+  .card { padding: 18px 16px; border-radius: var(--r); }
+  .cardHead { gap: 12px; margin-bottom: 16px; padding-bottom: 12px; }
+  .num { font-size: 36px; }
+  .cardHead h3 { font-size: 20px; }
+  .headMascot { display: none; }
+  .form { gap: 14px; }
+  .fine { padding: 12px 14px; font-size: 12px; }
+  .processing { padding: 48px 20px; border-radius: var(--r); }
+  .processing h3 { font-size: 20px; }
+  .textarea { min-height: 100px; }
+  /* Native field font-size >=16px prevents iOS auto-zoom */
+  .textarea, .select { font-size: 16px; }
+  .hero { padding: 20px 16px; gap: 16px; border-radius: var(--r); }
+  .scoreRing { width: 132px; height: 132px; }
+  .scoreNum { font-size: 36px; }
+  .bubble { position: static; transform: none; margin-bottom: 10px; display: inline-block; left: auto; top: auto; }
+  .issuesHead h2 { font-size: 24px; }
+  .issuesHead { margin: 20px 0 12px; }
+  .iss { grid-template-columns: 76px 1fr; }
+  .issTag { padding: 12px 6px; }
+  .issEmoji { font-size: 22px; }
+  .issLevel { font-size: 12px; }
+  .issBody { padding: 14px 16px; }
+  .issBody h4 { font-size: 15px; }
+  .card2 { padding: 18px 16px; border-radius: var(--r); }
+  .card2Title { font-size: 18px; }
+  .cta { padding: 18px; border-radius: var(--r); flex-direction: column; align-items: stretch; gap: 14px; }
+  .cta h3 { font-size: 18px; }
+  .ctaActions { margin-left: 0; justify-content: center; }
+}

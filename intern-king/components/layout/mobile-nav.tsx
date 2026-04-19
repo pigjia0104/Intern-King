@@ -15,7 +15,10 @@ export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card">
+    <nav
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
       <div className="flex justify-around py-2">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);

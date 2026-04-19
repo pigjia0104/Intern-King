@@ -197,3 +197,18 @@ body.ds-body {
   transform: translateY(-70%) rotate(45deg);
   pointer-events: none;
 }
+
+/* ---- Mobile tweaks ---- */
+.main-container {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .main-container { padding-bottom: 1.5rem; }
+}
+
+@media (max-width: 720px) {
+  /* Prevent iOS auto-zoom on focus by keeping font-size >= 16px */
+  .ds-field { font-size: 16px; }
+  .ds-btn.xl { padding: 14px 22px; font-size: 16px; }
+  .ds-btn.lg { padding: 12px 20px; font-size: 15px; }
+}
