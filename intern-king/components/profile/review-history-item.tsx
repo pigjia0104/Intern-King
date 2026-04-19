@@ -1,47 +1,64 @@
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { ReviewItem } from "@/types";
+import styles from "@/app/(main)/profile/profile.module.css";
 
 interface Props {
   review: ReviewItem;
 }
 
-const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  completed: { label: "已完成", variant: "default" },
-  processing: { label: "处理中", variant: "secondary" },
-  pending: { label: "排队中", variant: "outline" },
-  failed: { label: "失败", variant: "destructive" },
+const statusMap: Record<string, { label: string; cls: "flame" | "mint" | "ghost" | "rose" }> = {
+  completed: { label: "已完成", cls: "mint" },
+  processing: { label: "处理中", cls: "flame" },
+  pending: { label: "排队中", cls: "ghost" },
+  failed: { label: "失败", cls: "rose" },
 };
 
+function scoreColor(score: number | null) {
+  if (score === null) return "var(--ink-dim)";
+  if (score < 60) return "var(--poison)";
+  if (score < 80) return "var(--caution)";
+  return "var(--chill)";
+}
+
 export function ReviewHistoryItem({ review }: Props) {
-  const status = statusConfig[review.status] || statusConfig.pending;
+  const status = statusMap[review.status] || statusMap.pending;
+  const date = new Date(review.createdAt).toLocaleDateString("zh-CN");
+  const color = scoreColor(review.score);
 
   return (
-    <Link
-      href={`/review?reviewId=${review.id}`}
-      className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-accent transition-colors"
-    >
-      {/* Score badge */}
-      {review.score !== null ? (
-        <div className="h-12 w-12 rounded-full bg-flame/10 flex items-center justify-center">
-          <span className="text-lg font-bold text-flame">{review.score}</span>
-        </div>
-      ) : (
-        <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-          <span className="text-sm text-muted-foreground">--</span>
-        </div>
-      )}
-
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium">
-          {review.company} · {review.position}
-        </p>
-        <p className="text-xs text-muted-foreground mt-1">
-          {review.resumeFileName} · {new Date(review.createdAt).toLocaleDateString("zh-CN")}
-        </p>
+    <Link href={`/review?reviewId=${review.id}`} className={styles.item}>
+      <div className={styles.riScore}>
+        {review.score !== null ? (
+          <>
+            <div className={styles.riScoreNum} style={{ color }}>{review.score}</div>
+            <div className={styles.riScoreBar}>
+              <div
+                className={styles.riScoreFill}
+                style={{ width: `${review.score}%`, background: color }}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={styles.riScoreNum} style={{ color }}>--</div>
+            <div className={styles.riScoreBar}>
+              <div className={styles.riScoreFill} style={{ width: "0%" }} />
+            </div>
+          </>
+        )}
       </div>
 
-      <Badge variant={status.variant}>{status.label}</Badge>
+      <div className={styles.itemMain}>
+        <div className={styles.itemTitle}>
+          {review.company} · {review.position}
+          <span className={`sticker ${status.cls}`}>{status.label}</span>
+        </div>
+        <div className={styles.itemMeta}>
+          <span>📄 {review.resumeFileName}</span>
+          <span>·</span>
+          <span>{date}</span>
+        </div>
+      </div>
     </Link>
   );
 }

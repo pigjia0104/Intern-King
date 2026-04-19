@@ -1,12 +1,23 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { CompanyItem, CompanyFilters } from "@/types";
-import { Star, ExternalLink, Search } from "lucide-react";
+import { Mascot } from "@/components/brand/mascot";
+import styles from "./plaza.module.css";
 
 const LOCATIONS = ["北京", "上海", "深圳", "杭州", "广州", "成都", "南京", "武汉", "西安"];
 const CATEGORIES = ["后端", "前端", "算法", "产品", "设计", "运营", "测试", "数据", "硬件", "游戏"];
 const TYPES = ["暑期实习", "日常实习"];
+
+const CARD_COLORS = ["ink", "flame", "acid", "mint", "grape", "sky", "rose"] as const;
+type CardColor = (typeof CARD_COLORS)[number];
+
+function pickColor(name: string): CardColor {
+  let sum = 0;
+  for (let i = 0; i < name.length; i++) sum += name.charCodeAt(i);
+  return CARD_COLORS[sum % CARD_COLORS.length];
+}
 
 export default function JobsPage() {
   const [filters, setFilters] = useState<CompanyFilters>({ page: 1, pageSize: 50 });
@@ -36,11 +47,9 @@ export default function JobsPage() {
   }, [fetchCompanies]);
 
   const toggleFavorite = async (companyId: string, isFavorited: boolean) => {
-    // Optimistic update
     setCompanies((prev) =>
       prev.map((c) => (c.id === companyId ? { ...c, isFavorited: !isFavorited } : c))
     );
-
     try {
       if (isFavorited) {
         await fetch(`/api/favorites/${companyId}`, { method: "DELETE" });
@@ -52,88 +61,104 @@ export default function JobsPage() {
         });
       }
     } catch {
-      // Revert on failure
       setCompanies((prev) =>
         prev.map((c) => (c.id === companyId ? { ...c, isFavorited } : c))
       );
     }
   };
 
+  const clearFilters = () =>
+    setFilters({ page: 1, pageSize: filters.pageSize });
+
+  const favCount = companies.filter((c) => c.isFavorited).length;
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">
-        实习<span className="text-flame">广场</span>
-      </h1>
-
-      {/* Filters Bar */}
-      <div className="flex flex-wrap gap-3 mb-8">
-        {/* Search */}
-        <div className="relative flex-1 min-w-[200px] max-w-[320px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="搜索公司名称..."
-            className="w-full pl-10 pr-4 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-flame/20 focus:border-flame/50"
-            value={filters.search || ""}
-            onChange={(e) => setFilters({ ...filters, search: e.target.value || undefined, page: 1 })}
-          />
+    <div className={styles.plaza}>
+      {/* Page Header */}
+      <div className={styles.ph}>
+        <div>
+          <div className={styles.phKicker}>· PLAZA · {total} 家在招 · 每天都在更新</div>
+          <h1 className={styles.phTitle}>
+            实习<span style={{ color: "var(--flame-ink)" }}>广场</span>
+          </h1>
         </div>
-
-        {/* Location Filter */}
-        <select
-          className="px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-flame/20"
-          value={filters.location || ""}
-          onChange={(e) => setFilters({ ...filters, location: e.target.value || undefined, page: 1 })}
-        >
-          <option value="">全部地点</option>
-          {LOCATIONS.map((l) => (
-            <option key={l} value={l}>{l}</option>
-          ))}
-        </select>
-
-        {/* Category Filter */}
-        <select
-          className="px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-flame/20"
-          value={filters.category || ""}
-          onChange={(e) => setFilters({ ...filters, category: e.target.value || undefined, page: 1 })}
-        >
-          <option value="">全部岗位</option>
-          {CATEGORIES.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-
-        {/* Type Filter */}
-        <select
-          className="px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-flame/20"
-          value={filters.type || ""}
-          onChange={(e) => setFilters({ ...filters, type: e.target.value || undefined, page: 1 })}
-        >
-          <option value="">全部类型</option>
-          {TYPES.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
-
-        <span className="ml-auto text-sm text-muted-foreground self-center">
-          共 <span className="text-flame font-semibold">{total}</span> 家公司
-        </span>
+        <div className={styles.phStats}>
+          <div className={styles.pstat}>
+            <b>{companies.length}</b>
+            <span>当前筛选</span>
+          </div>
+          <div className={styles.pstat}>
+            <b>{favCount}</b>
+            <span>本页收藏</span>
+          </div>
+        </div>
       </div>
 
-      {/* Company Cards Grid */}
+      {/* Filter Bar */}
+      <div className={styles.filterbar}>
+        <div className={styles.fbSearch}>
+          <SearchIcon />
+          <input
+            placeholder="搜公司名，比如…字节？拼多多？"
+            value={filters.search || ""}
+            onChange={(e) =>
+              setFilters({ ...filters, search: e.target.value || undefined, page: 1 })
+            }
+          />
+          {filters.search && (
+            <button
+              onClick={() => setFilters({ ...filters, search: undefined, page: 1 })}
+              aria-label="清空搜索"
+            >
+              <CloseIcon />
+            </button>
+          )}
+        </div>
+        <FilterSelect
+          label="地点"
+          value={filters.location || ""}
+          onChange={(v) =>
+            setFilters({ ...filters, location: v || undefined, page: 1 })
+          }
+          options={LOCATIONS}
+        />
+        <FilterSelect
+          label="岗位"
+          value={filters.category || ""}
+          onChange={(v) =>
+            setFilters({ ...filters, category: v || undefined, page: 1 })
+          }
+          options={CATEGORIES}
+        />
+        <FilterSelect
+          label="类型"
+          value={filters.type || ""}
+          onChange={(v) =>
+            setFilters({ ...filters, type: v || undefined, page: 1 })
+          }
+          options={TYPES}
+        />
+      </div>
+
+      {/* Grid */}
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">加载中...</div>
+        <div className={styles.loading}>加载中…</div>
       ) : companies.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <p className="text-lg mb-2">没有找到匹配的公司</p>
-          <p className="text-sm">试试调整筛选条件</p>
+        <div className={styles.empty}>
+          <Mascot size={120} mood="cry" />
+          <div className={styles.peTitle}>一个都没找到…</div>
+          <div className={styles.peSub}>换个条件试试？别太挑了。</div>
+          <button className="ds-btn ghost sm" onClick={clearFilters}>
+            清空筛选
+          </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {companies.map((company) => (
+        <div className={styles.grid}>
+          {companies.map((c) => (
             <CompanyCard
-              key={company.id}
-              company={company}
+              key={c.id}
+              company={c}
+              color={pickColor(c.name)}
               onToggleFavorite={toggleFavorite}
             />
           ))}
@@ -145,100 +170,159 @@ export default function JobsPage() {
 
 function CompanyCard({
   company,
+  color,
   onToggleFavorite,
 }: {
   company: CompanyItem;
+  color: CardColor;
   onToggleFavorite: (id: string, isFavorited: boolean) => void;
 }) {
-  const gradientColors = [
-    "from-green-900/30 to-green-950/30 text-green-400 border-green-400/20",
-    "from-orange-900/30 to-orange-950/30 text-orange-400 border-orange-400/20",
-    "from-blue-900/30 to-blue-950/30 text-blue-400 border-blue-400/20",
-    "from-purple-900/30 to-purple-950/30 text-purple-400 border-purple-400/20",
-    "from-yellow-900/30 to-yellow-950/30 text-yellow-400 border-yellow-400/20",
-    "from-red-900/30 to-red-950/30 text-red-400 border-red-400/20",
-  ];
-  const colorIndex = company.name.charCodeAt(0) % gradientColors.length;
+  const topStyle: React.CSSProperties = {
+    background:
+      color === "ink"
+        ? "#1a1613"
+        : color === "flame"
+        ? "var(--flame)"
+        : `var(--${color})`,
+    color:
+      color === "ink" || color === "flame"
+        ? "#fff"
+        : `var(--${color}-ink)`,
+  };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5 hover:border-flame/30 hover:bg-card/80 transition-all duration-200 group">
-      {/* Header */}
-      <div className="flex items-start gap-3 mb-4">
-        <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${gradientColors[colorIndex]} border flex items-center justify-center text-lg font-bold shrink-0`}>
-          {company.abbr}
+    <div className={styles.pcard}>
+      <div className={styles.pcardTop} style={topStyle}>
+        <div className={styles.pcardName}>{company.name}</div>
+        <button
+          className={`${styles.pcardFav} ${company.isFavorited ? styles.on : ""}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavorite(company.id, company.isFavorited);
+          }}
+          aria-label={company.isFavorited ? "取消收藏" : "收藏"}
+        >
+          <StarIcon filled={company.isFavorited} />
+        </button>
+      </div>
+      <div className={styles.pcardBody}>
+        <div className={styles.pcardSeasons}>
+          {company.types.map((t) => (
+            <span
+              key={t}
+              className={`sticker ${t === "暑期实习" ? "acid" : "mint"}`}
+            >
+              {t}
+            </span>
+          ))}
         </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-sm mb-1">{company.name}</h3>
-          <div className="flex gap-1.5 flex-wrap">
-            {company.types.map((t) => (
-              <span
-                key={t}
-                className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                  t === "暑期实习"
-                    ? "bg-flame/10 text-flame border border-flame/20"
-                    : "bg-blue-500/10 text-blue-400 border border-blue-400/20"
-                }`}
-              >
-                {t}
+        <div className={styles.pcardSec}>
+          <div className={styles.pcardSecLabel}>在招岗位</div>
+          <div className={styles.pcardTags}>
+            {company.categories.slice(0, 5).map((r) => (
+              <span key={r} className={styles.rtag}>
+                {r}
+              </span>
+            ))}
+            {company.categories.length > 5 && (
+              <span className={`${styles.rtag} ${styles.more}`}>
+                +{company.categories.length - 5}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className={styles.pcardSec}>
+          <div className={styles.pcardSecLabel}>工作地点</div>
+          <div className={styles.pcardTags}>
+            {company.locations.map((loc) => (
+              <span key={loc} className={styles.ctag}>
+                📍 {loc}
               </span>
             ))}
           </div>
         </div>
-        <button
-          onClick={() => onToggleFavorite(company.id, company.isFavorited)}
-          className={`p-1.5 rounded-full transition-colors ${
-            company.isFavorited
-              ? "text-yellow-400 hover:text-yellow-300"
-              : "text-muted-foreground hover:text-muted hover:bg-muted"
-          }`}
-          title={company.isFavorited ? "取消收藏" : "收藏"}
-        >
-          <Star className="h-4 w-4" fill={company.isFavorited ? "currentColor" : "none"} />
-        </button>
-      </div>
-
-      {/* Categories */}
-      <div className="mb-3">
-        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-semibold">在招岗位</p>
-        <div className="flex flex-wrap gap-1.5">
-          {company.categories.map((c) => (
-            <span key={c} className="text-xs px-2.5 py-1 bg-muted/50 rounded-full text-muted-foreground">
-              {c}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Locations */}
-      <div className="mb-4">
-        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-semibold">工作地点</p>
-        <div className="flex flex-wrap gap-1.5">
-          {company.locations.slice(0, 5).map((l) => (
-            <span key={l} className="text-xs px-2.5 py-1 bg-emerald-500/10 rounded-full text-emerald-400 border border-emerald-500/20">
-              {l}
-            </span>
-          ))}
-          {company.locations.length > 5 && (
-            <span className="text-xs px-2.5 py-1 bg-emerald-500/10 rounded-full text-emerald-400 border border-emerald-500/20">
-              +{company.locations.length - 5}
-            </span>
+        <div className={styles.pcardFoot}>
+          <Link
+            href={`/review?company=${encodeURIComponent(company.name)}`}
+            className="ds-btn sm ghost"
+          >
+            🔥 让 AI 骂我
+          </Link>
+          {company.careerUrl ? (
+            <a
+              href={company.careerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ds-btn sm primary"
+            >
+              官网投递 <ExternalIcon />
+            </a>
+          ) : (
+            <button className="ds-btn sm primary" disabled>
+              暂无链接
+            </button>
           )}
         </div>
       </div>
-
-      {/* Footer */}
-      <div className="flex justify-end pt-3 border-t border-border">
-        <a
-          href={company.careerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-flame to-flame-600 text-white text-xs font-semibold rounded-lg hover:shadow-lg hover:shadow-flame/20 transition-all"
-          onClick={(e) => e.stopPropagation()}
-        >
-          官网投递
-          <ExternalLink className="h-3 w-3" />
-        </a>
-      </div>
     </div>
+  );
+}
+
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+}) {
+  return (
+    <div className="ds-select">
+      <select value={value} onChange={(e) => onChange(e.target.value)}>
+        <option value="">全部{label}</option>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M6 6l12 12M18 6 6 18" />
+    </svg>
+  );
+}
+
+function ExternalIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M7 17L17 7" />
+      <path d="M9 7h8v8" />
+    </svg>
+  );
+}
+
+function StarIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M12 3l2.6 5.8 6.4.7-4.8 4.4 1.4 6.3L12 17l-5.6 3.2L7.8 14 3 9.5l6.4-.7L12 3Z" />
+    </svg>
   );
 }
