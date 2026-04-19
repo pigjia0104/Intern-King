@@ -257,8 +257,14 @@
     gap: 8px;
     margin-bottom: 16px;
   }
-  .fbSearch { min-width: 0; width: 100%; padding: 7px 12px; }
+  .fbSearch { flex: 1 1 100%; min-width: 0; padding: 7px 12px; }
   .fbSearch input { font-size: 16px; }
+  .filterbar :global(.ds-select) { flex: 1 1 0; min-width: 0; }
+  .filterbar :global(.ds-select select) {
+    width: 100%;
+    padding: 9px 28px 9px 12px;
+    font-size: 13px;
+  }
   .grid {
     grid-template-columns: 1fr;
     gap: 14px;
