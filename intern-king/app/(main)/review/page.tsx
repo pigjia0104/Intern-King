@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { ReviewInput } from "@/components/review/review-input";
 import { ReviewResultDisplay } from "@/components/review/review-result";
 import { ReviewDetail } from "@/types";
-import { Loader2 } from "lucide-react";
+import styles from "./review.module.css";
 
 const POLL_INTERVAL = 2000;
 const MAX_POLLS = 60;
@@ -13,6 +13,7 @@ const MAX_POLLS = 60;
 function ReviewPageContent() {
   const searchParams = useSearchParams();
   const reviewId = searchParams.get("reviewId");
+  const prefillCompany = searchParams.get("company") || "";
 
   const [reviewData, setReviewData] = useState<ReviewDetail | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -26,14 +27,11 @@ function ReviewPageContent() {
       fetch(`/api/reviews/${reviewId}`)
         .then((r) => r.json())
         .then((json) => {
-          if (json.data) {
-            setReviewData(json.data);
-          }
+          if (json.data) setReviewData(json.data);
         });
     }
   }, [reviewId]);
 
-  // Polling logic
   const pollReview = useCallback((id: string) => {
     pollTimer.current = setInterval(async () => {
       pollCount.current++;
@@ -60,7 +58,6 @@ function ReviewPageContent() {
     }, POLL_INTERVAL);
   }, []);
 
-  // Cleanup polling on unmount
   useEffect(() => {
     return () => {
       if (pollTimer.current) clearInterval(pollTimer.current);
@@ -95,46 +92,109 @@ function ReviewPageContent() {
     }
   };
 
+  const handleRetry = () => {
+    setReviewData(null);
+    setError("");
+    setIsProcessing(false);
+  };
+
+  const showingResult =
+    reviewData?.status === "completed" && reviewData.content;
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">
-        AI <span className="text-flame">锐评</span>
-      </h1>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Left: Input Panel */}
+    <div className={styles.roast}>
+      <div className={styles.ph}>
         <div>
-          <ReviewInput onSubmit={handleSubmit} isProcessing={isProcessing} />
+          <div className={styles.phKicker}>· AI ROAST · 准备好被骂，比被哄更有用</div>
+          <h1 className={styles.phTitle}>
+            AI <em>锐评</em>
+          </h1>
         </div>
-
-        {/* Right: Result Panel */}
-        <div>
-          {isProcessing && (
-            <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
-              <Loader2 className="h-10 w-10 animate-spin text-flame mb-4" />
-              <p className="text-lg font-medium">AI 正在疯狂吐槽你的简历...</p>
-              <p className="text-sm mt-2">联网搜索面经 → 相关度筛选 → 生成锐评</p>
-            </div>
-          )}
-
-          {error && !isProcessing && (
-            <div className="p-4 rounded-lg bg-destructive/10 text-destructive text-sm">
-              {error}
-            </div>
-          )}
-
-          {reviewData?.status === "completed" && reviewData.content && (
-            <ReviewResultDisplay result={reviewData.content} />
-          )}
-        </div>
+        {showingResult && (
+          <div className={styles.phActions}>
+            <button type="button" className="ds-btn ghost sm" onClick={handleRetry}>
+              ← 再来一次
+            </button>
+          </div>
+        )}
       </div>
+
+      {showingResult ? (
+        <ReviewResultDisplay
+          result={reviewData.content!}
+          detail={reviewData}
+          onRetry={handleRetry}
+        />
+      ) : (
+        <div className={styles.grid}>
+          <div>
+            {error && !isProcessing && (
+              <div className={styles.errorBlock}>{error}</div>
+            )}
+            {isProcessing ? (
+              <div className={styles.processing}>
+                <div className={styles.spin} style={{ borderColor: "rgba(0,0,0,0.15)", borderTopColor: "var(--flame)" }} />
+                <h3>AI 正在疯狂吐槽你的简历…</h3>
+                <p>联网搜索面经 → 相关度筛选 → 生成锐评</p>
+              </div>
+            ) : (
+              <ReviewInput
+                onSubmit={handleSubmit}
+                isProcessing={isProcessing}
+                prefillCompany={prefillCompany}
+              />
+            )}
+
+            <div className={styles.fine}>
+              <span>🫡</span>
+              <div>
+                本站 AI 仅代表 AI 个人观点，不代表宇宙真理。
+                <br />
+                如果被骂破防，建议去散个步、改简历、再回来挨下一顿。
+              </div>
+            </div>
+          </div>
+
+          <aside className={styles.side}>
+            <div className={`${styles.tip} ${styles.tipAcid}`}>
+              <div className={styles.tipTitle}>🔪 会被骂什么</div>
+              <ul>
+                <li>项目描述 <b>废话多 / 没量化</b></li>
+                <li>技术栈 <b>对不上 JD</b></li>
+                <li>实习经历 <b>像流水账</b></li>
+                <li>自我评价 <b>ChatGPT 味太重</b></li>
+              </ul>
+            </div>
+            <div className={`${styles.tip} ${styles.tipMint}`}>
+              <div className={styles.tipTitle}>🛡️ 会得到什么</div>
+              <ul>
+                <li>一个 <b>撕裂度评分</b>（0-100）</li>
+                <li>每条硬伤 <b>具体位置 + 建议</b></li>
+                <li>JD 匹配度 <b>维度拆解</b></li>
+                <li>一份带伤的 <b>自信心</b></li>
+              </ul>
+            </div>
+            <div className={`${styles.tip} ${styles.tipGrape}`}>
+              <div className={styles.tipTitle}>🧠 锐评语气</div>
+              <div className={styles.tipSlider}>
+                <span>温柔</span>
+                <div className={styles.tsr}>
+                  <div className={styles.tsrDot} style={{ left: "80%" }} />
+                </div>
+                <span className={styles.bold}>毒辣</span>
+              </div>
+              <div className={styles.tipNote}>（默认最毒，因为温柔没用）</div>
+            </div>
+          </aside>
+        </div>
+      )}
     </div>
   );
 }
 
 export default function ReviewPage() {
   return (
-    <Suspense fallback={<div className="text-center py-12 text-muted-foreground">加载中...</div>}>
+    <Suspense fallback={<div style={{ padding: 80, textAlign: "center", color: "var(--ink-dim)" }}>加载中…</div>}>
       <ReviewPageContent />
     </Suspense>
   );

@@ -1,0 +1,241 @@
+.plaza {
+  padding: 8px 0 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Page header */
+.ph {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 2px dashed var(--line-2);
+}
+.phKicker {
+  font-family: var(--font-mono-ds);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.phTitle {
+  font-family: var(--font-display);
+  font-size: 40px;
+  margin: 0;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+}
+.phStats {
+  display: flex;
+  gap: 16px;
+}
+.pstat {
+  padding: 10px 16px;
+  background: var(--paper-2);
+  border: 2px solid var(--ink);
+  border-radius: var(--r-sm);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.pstat b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--flame-ink);
+}
+.pstat span {
+  font-size: 11px;
+  color: var(--ink-dim);
+  font-family: var(--font-mono-ds);
+}
+
+/* Filter bar */
+.filterbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  background: var(--paper-2);
+  border: 2px solid var(--ink);
+  border-radius: var(--r);
+  box-shadow: 3px 3px 0 var(--ink);
+  flex-wrap: wrap;
+}
+.fbSearch {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  color: var(--ink);
+}
+.fbSearch input {
+  border: none;
+  outline: none;
+  flex: 1;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-family: var(--font-sans-ds);
+}
+.fbSearch input::placeholder {
+  color: var(--ink-dim);
+}
+.fbSearch button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-dim);
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.loading {
+  padding: 80px 20px;
+  text-align: center;
+  color: var(--ink-dim);
+  font-family: var(--font-mono-ds);
+}
+
+/* Card */
+.pcard {
+  background: var(--paper);
+  border: 2.5px solid var(--ink);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+.pcard:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+.pcardTop {
+  position: relative;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 2.5px solid var(--ink);
+}
+.pcardName {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  word-break: break-word;
+  flex: 1;
+  min-width: 0;
+}
+.pcardFav {
+  flex-shrink: 0;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--ink);
+  padding: 0;
+}
+.pcardFav.on {
+  background: var(--acid);
+  color: var(--acid-ink);
+}
+.pcardBody {
+  padding: 16px 18px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pcardSeasons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.pcardSec {
+  display: flex;
+  flex-direction: column;
+}
+.pcardSecLabel {
+  font-size: 11px;
+  color: var(--ink-dim);
+  font-family: var(--font-mono-ds);
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+.pcardTags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.rtag {
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: var(--paper-3);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+.rtag.more {
+  background: var(--ink);
+  color: var(--paper);
+}
+.ctag {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--mint);
+  color: var(--mint-ink);
+  font-size: 11.5px;
+  font-weight: 600;
+  border: 1.5px solid var(--mint-ink);
+}
+.pcardFoot {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.pcardFoot > * {
+  flex: 1;
+}
+
+/* Empty */
+.empty {
+  grid-column: 1 / -1;
+  padding: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.peTitle {
+  font-family: var(--font-display);
+  font-size: 28px;
+  margin-top: 8px;
+}
+.peSub {
+  color: var(--ink-dim);
+}

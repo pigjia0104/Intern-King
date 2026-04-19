@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./design-system.css";
 
 export const metadata: Metadata = {
   title: "实习小霸王 — 一站式实习求职平台",
@@ -12,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" className="dark">
-      <body className="min-h-screen bg-background text-foreground antialiased">
+    <html lang="zh-CN" className="ds-page">
+      <body className="ds-body min-h-screen antialiased">
         {children}
       </body>
     </html>

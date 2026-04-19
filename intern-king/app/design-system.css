@@ -1,0 +1,199 @@
+/* ============================================================
+   实习小霸王 · 毒舌社交风 · 设计系统
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/misans@4.1.0/lib/Normal/MiSans-Normal.min.css');
+@import url('https://cdn.jsdelivr.net/npm/misans@4.1.0/lib/Normal/MiSans-Semibold.min.css');
+@import url('https://cdn.jsdelivr.net/npm/cn-fontsource/cn-fontsource-smiley-sans-oblique/font.css');
+
+:root {
+  --ink: oklch(0.22 0.03 60);
+  --ink-soft: oklch(0.38 0.03 60);
+  --ink-dim: oklch(0.55 0.02 60);
+  --paper: oklch(0.985 0.012 85);
+  --paper-2: oklch(0.965 0.018 85);
+  --paper-3: oklch(0.94 0.022 85);
+  --line: oklch(0.88 0.02 70);
+  --line-2: oklch(0.8 0.025 70);
+
+  --flame: oklch(0.7 0.2 42);
+  --flame-ink: oklch(0.35 0.16 40);
+  --flame-soft: oklch(0.93 0.08 60);
+
+  --acid: oklch(0.92 0.18 100);
+  --acid-ink: oklch(0.42 0.14 90);
+  --mint: oklch(0.86 0.14 165);
+  --mint-ink: oklch(0.38 0.1 170);
+  --grape: oklch(0.78 0.16 305);
+  --grape-ink: oklch(0.35 0.16 310);
+  --sky: oklch(0.82 0.13 240);
+  --sky-ink: oklch(0.38 0.14 245);
+  --rose: oklch(0.82 0.16 15);
+  --rose-ink: oklch(0.38 0.16 20);
+
+  --poison: oklch(0.6 0.22 28);
+  --caution: oklch(0.78 0.18 75);
+  --chill: oklch(0.68 0.14 160);
+
+  --font-sans-ds: "MiSans", "HarmonyOS Sans", -apple-system, "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
+  --font-display: "Smiley Sans Oblique", "Smiley Sans", "MiSans", sans-serif;
+  --font-mono-ds: "Space Grotesk", ui-monospace, monospace;
+
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+}
+
+/* 只做浅色模式 —— 强制设计系统页面背景 */
+html.ds-page,
+body.ds-body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans-ds);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---- Sticker 贴纸 ---- */
+.sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  white-space: nowrap;
+  font-family: var(--font-sans-ds);
+}
+.sticker.flame { background: var(--flame); color: #fff; border-color: var(--flame-ink); }
+.sticker.acid { background: var(--acid); color: var(--acid-ink); border-color: var(--acid-ink); }
+.sticker.mint { background: var(--mint); color: var(--mint-ink); border-color: var(--mint-ink); }
+.sticker.grape { background: var(--grape); color: var(--grape-ink); border-color: var(--grape-ink); }
+.sticker.sky { background: var(--sky); color: var(--sky-ink); border-color: var(--sky-ink); }
+.sticker.rose { background: var(--rose); color: var(--rose-ink); border-color: var(--rose-ink); }
+.sticker.ghost { background: transparent; color: var(--ink-soft); border-color: var(--line-2); }
+
+/* ---- Button ---- */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: var(--font-sans-ds);
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 3px 3px 0 var(--ink);
+  text-decoration: none;
+}
+.ds-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.ds-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.ds-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ds-btn.primary { background: var(--flame); color: #fff; }
+.ds-btn.acid { background: var(--acid); color: var(--acid-ink); }
+.ds-btn.mint { background: var(--mint); color: var(--mint-ink); }
+.ds-btn.ghost { background: transparent; box-shadow: none; border-color: var(--line-2); }
+.ds-btn.ghost:hover { box-shadow: 2px 2px 0 var(--ink); transform: translate(-1px, -1px); border-color: var(--ink); }
+
+.ds-btn.lg { padding: 14px 26px; font-size: 16px; }
+.ds-btn.xl { padding: 18px 32px; font-size: 18px; }
+.ds-btn.sm { padding: 6px 12px; font-size: 12px; box-shadow: 2px 2px 0 var(--ink); }
+
+/* ---- Card ---- */
+.ds-card {
+  background: var(--paper-2);
+  border: 2px solid var(--ink);
+  border-radius: var(--r-lg);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+/* ---- Field ---- */
+.ds-field {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 14px;
+  font-family: var(--font-sans-ds);
+  outline: none;
+}
+.ds-field:focus { box-shadow: 3px 3px 0 var(--flame); border-color: var(--flame); }
+.ds-field::placeholder { color: var(--ink-dim); }
+
+.ds-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--ink);
+}
+
+.scribble {
+  font-family: var(--font-display);
+  color: var(--flame-ink);
+  font-size: 14px;
+  transform: rotate(-3deg);
+  display: inline-block;
+}
+
+/* ---- Animations ---- */
+@keyframes ds-wiggle { 0%,100%{transform:rotate(-2deg);} 50%{transform:rotate(2deg);} }
+@keyframes ds-float-y { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+@keyframes ds-marquee { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+@keyframes ds-pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+.wiggle { animation: ds-wiggle 2.4s ease-in-out infinite; transform-origin: center; }
+.floaty { animation: ds-float-y 3s ease-in-out infinite; }
+
+.marquee {
+  display: flex;
+  gap: 24px;
+  animation: ds-marquee 32s linear infinite;
+  white-space: nowrap;
+}
+
+/* ---- Select ---- */
+.ds-select {
+  position: relative;
+  display: inline-block;
+}
+.ds-select select {
+  appearance: none;
+  padding: 8px 32px 8px 14px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+  font-family: var(--font-sans-ds);
+  cursor: pointer;
+  color: var(--ink);
+}
+.ds-select::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}

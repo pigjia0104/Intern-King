@@ -1,20 +1,36 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Mascot } from "@/components/brand/mascot";
 import { ResumeCard } from "@/components/profile/resume-card";
 import { ReviewHistoryItem } from "@/components/profile/review-history-item";
 import { UploadResumeDialog } from "@/components/profile/upload-resume-dialog";
 import { ResumeItem, ReviewItem, UserProfile } from "@/types";
-import { FileText, Star, FileSearch } from "lucide-react";
+import styles from "./profile.module.css";
+
+type TabId = "resume" | "roasts" | "favs";
+
+interface FavoriteItem {
+  id: string;
+  name: string;
+  abbr?: string;
+  categories?: string[];
+}
+
+function computeLevel(reviewCount: number) {
+  // 每 3 次锐评升一级，显示下一级进度
+  const lv = Math.floor(reviewCount / 3) + 1;
+  const progress = ((reviewCount % 3) / 3) * 100;
+  const remain = 3 - (reviewCount % 3);
+  return { lv, progress, remain };
+}
 
 export default function ProfilePage() {
+  const [tab, setTab] = useState<TabId>("resume");
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [resumes, setResumes] = useState<ResumeItem[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
-  const [favorites, setFavorites] = useState<Array<{ id: string; name: string; abbr: string; categories?: string[] }>>([]);
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
   const loadProfile = useCallback(async () => {
     const res = await fetch("/api/user/profile");
@@ -59,87 +75,151 @@ export default function ProfilePage() {
     if (json.data?.url) window.open(json.data.url, "_blank");
   };
 
+  const maxScore = useMemo(() => {
+    const scores = reviews
+      .map((r) => r.score)
+      .filter((s): s is number => typeof s === "number");
+    return scores.length > 0 ? Math.max(...scores) : 0;
+  }, [reviews]);
+
+  const resumeCount = profile?.stats.resumeCount ?? 0;
+  const reviewCount = profile?.stats.reviewCount ?? 0;
+  const favoriteCount = profile?.stats.favoriteCount ?? 0;
+  const level = computeLevel(reviewCount);
+
+  const displayName = profile?.name || profile?.email || "加载中…";
+
+  const tabs: Array<{ id: TabId; label: string; emoji: string; count: number }> = [
+    { id: "resume", label: "简历库", emoji: "📄", count: resumeCount },
+    { id: "roasts", label: "锐评记录", emoji: "🔥", count: reviewCount },
+    { id: "favs", label: "收藏夹", emoji: "⭐", count: favoriteCount },
+  ];
+
   return (
-    <div>
-      {/* User Card */}
-      <Card className="bg-card border-border mb-6">
-        <CardContent className="pt-6 flex items-center gap-4">
-          <Avatar className="h-16 w-16">
-            <AvatarImage src={profile?.avatarUrl || undefined} />
-            <AvatarFallback className="bg-flame/10 text-flame text-lg">
-              {profile?.name?.[0] || profile?.email?.[0] || "U"}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h2 className="text-xl font-bold">{profile?.name || profile?.email}</h2>
-            <div className="flex gap-6 mt-2 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <FileText className="h-4 w-4" /> {profile?.stats.resumeCount || 0} 份简历
-              </span>
-              <span className="flex items-center gap-1">
-                <FileSearch className="h-4 w-4" /> {profile?.stats.reviewCount || 0} 次锐评
-              </span>
-              <span className="flex items-center gap-1">
-                <Star className="h-4 w-4" /> {profile?.stats.favoriteCount || 0} 个收藏
-              </span>
-            </div>
+    <div className={styles.me}>
+      <div className={styles.ph}>
+        <div className={styles.phKicker}>· PROFILE · 你的专属毒打档案</div>
+        <h1 className={styles.phTitle}>
+          个人<em>中心</em>
+        </h1>
+      </div>
+
+      {/* Profile card */}
+      <div className={styles.profile}>
+        <div className={styles.ava}>
+          <div className={styles.avaBg} />
+          <Mascot size={96} mood="cool" />
+        </div>
+
+        <div className={styles.info}>
+          <div className={styles.row}>
+            <h2>{displayName}</h2>
+            <span className="sticker flame">毒打 LV.{level.lv}</span>
           </div>
-        </CardContent>
-      </Card>
+          <div className={styles.stats}>
+            <div className={styles.stat}><b>{resumeCount}</b><span>份简历</span></div>
+            <div className={styles.stat}><b>{reviewCount}</b><span>次锐评</span></div>
+            <div className={styles.stat}><b>{favoriteCount}</b><span>个收藏</span></div>
+            <div className={styles.stat}><b>{maxScore}</b><span>最高分</span></div>
+          </div>
+          <div>
+            <div className={styles.mbLabel}>距离下一等级</div>
+            <div className={styles.mbTrack}>
+              <div className={styles.mbFill} style={{ width: `${level.progress}%` }} />
+            </div>
+            <div className={styles.mbMeta}>再挨 {level.remain} 次骂就能升级</div>
+          </div>
+        </div>
+      </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="resumes">
-        <TabsList className="mb-4">
-          <TabsTrigger value="resumes">简历库</TabsTrigger>
-          <TabsTrigger value="reviews">锐评记录</TabsTrigger>
-          <TabsTrigger value="favorites">收藏夹</TabsTrigger>
-        </TabsList>
+      <div className={styles.tabs}>
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            className={`${styles.tab} ${tab === t.id ? styles.on : ""}`}
+            onClick={() => setTab(t.id)}
+          >
+            <span className={styles.tabEmoji}>{t.emoji}</span>
+            <span>{t.label}</span>
+            <span className={styles.tabCount}>{t.count}</span>
+          </button>
+        ))}
+      </div>
 
-        <TabsContent value="resumes">
-          <div className="mb-4">
-            <UploadResumeDialog onUploaded={() => { loadResumes(); loadProfile(); }} />
-          </div>
-          <div className="grid gap-3">
+      <div className={styles.body}>
+        {tab === "resume" && (
+          <>
+            <div className={styles.actions}>
+              <UploadResumeDialog onUploaded={() => { loadResumes(); loadProfile(); }} />
+              <div className={styles.tip}>💡 PDF / DOCX，建议不超过 10MB</div>
+            </div>
             {resumes.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">还没有上传简历</p>
+              <div className={styles.empty}>
+                <Mascot size={96} mood="cry" />
+                <div className={styles.emptyTitle}>还没上传任何简历</div>
+                <div className={styles.emptySub}>上传一份，AI 才能开始骂。</div>
+              </div>
             ) : (
-              resumes.map((r) => (
-                <ResumeCard
-                  key={r.id}
-                  resume={r}
-                  onDelete={handleDeleteResume}
-                  onDownload={handleDownloadResume}
-                />
-              ))
+              <div className={styles.list}>
+                {resumes.map((r) => (
+                  <ResumeCard
+                    key={r.id}
+                    resume={r}
+                    onDelete={handleDeleteResume}
+                    onDownload={handleDownloadResume}
+                  />
+                ))}
+              </div>
             )}
-          </div>
-        </TabsContent>
+          </>
+        )}
 
-        <TabsContent value="reviews">
-          <div className="grid gap-3">
+        {tab === "roasts" && (
+          <>
             {reviews.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">还没有锐评记录</p>
+              <div className={styles.empty}>
+                <Mascot size={96} mood="smug" />
+                <div className={styles.emptyTitle}>还没被骂过</div>
+                <div className={styles.emptySub}>去 AI 锐评挨第一顿毒打。</div>
+              </div>
             ) : (
-              reviews.map((r) => <ReviewHistoryItem key={r.id} review={r} />)
+              <div className={styles.list}>
+                {reviews.map((r) => (
+                  <ReviewHistoryItem key={r.id} review={r} />
+                ))}
+              </div>
             )}
-          </div>
-        </TabsContent>
+          </>
+        )}
 
-        <TabsContent value="favorites">
-          <div className="grid gap-3">
+        {tab === "favs" && (
+          <>
             {favorites.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">还没有收藏公司</p>
+              <div className={styles.empty}>
+                <Mascot size={96} mood="cry" />
+                <div className={styles.emptyTitle}>还没收藏任何公司</div>
+                <div className={styles.emptySub}>去实习广场看看？挑几家心动的。</div>
+              </div>
             ) : (
-              favorites.map((f) => (
-                <div key={f.id} className="p-4 rounded-lg border border-border">
-                  <p className="text-sm font-medium">{f.name}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{f.categories?.join("、")}</p>
-                </div>
-              ))
+              <div className={styles.list}>
+                {favorites.map((f) => (
+                  <div key={f.id} className={styles.favItem}>
+                    <div className={styles.favLogo}>{f.abbr || f.name.charAt(0)}</div>
+                    <div className={styles.favMain}>
+                      <div className={styles.favName}>{f.name}</div>
+                      {f.categories && f.categories.length > 0 && (
+                        <div className={styles.favCats}>{f.categories.join("、")}</div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
-          </div>
-        </TabsContent>
-      </Tabs>
+          </>
+        )}
+      </div>
     </div>
   );
 }
