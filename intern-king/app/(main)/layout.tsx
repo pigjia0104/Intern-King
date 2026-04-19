@@ -10,7 +10,7 @@ export default function MainLayout({
     <div className="min-h-screen">
       <Sidebar />
       <main className="md:pl-60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
+        <div className="main-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {children}
         </div>
       </main>

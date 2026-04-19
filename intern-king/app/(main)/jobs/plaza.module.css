@@ -239,3 +239,40 @@
 .peSub {
   color: var(--ink-dim);
 }
+
+@media (max-width: 720px) {
+  .ph {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+  }
+  .phTitle { font-size: 32px; }
+  .phStats { gap: 10px; width: 100%; }
+  .pstat { padding: 8px 12px; flex: 1; text-align: center; }
+  .pstat b { font-size: 20px; }
+  .filterbar {
+    padding: 10px;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .fbSearch { min-width: 0; width: 100%; padding: 7px 12px; }
+  .fbSearch input { font-size: 16px; }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .pcardTop { padding: 14px; gap: 10px; }
+  .pcardName { font-size: 20px; }
+  .pcardFav { width: 32px; height: 32px; }
+  .pcardBody { padding: 14px; gap: 10px; }
+  .pcardFoot { flex-direction: column; }
+  .pcardFoot > * { width: 100%; }
+}
+
+@media (min-width: 721px) and (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}

@@ -53,6 +53,14 @@
   z-index: 3;
 }
 
+@media (max-width: 520px) {
+  .auth { padding: 24px 14px; }
+  .card { padding: 44px 22px 22px; border-radius: var(--r-lg); box-shadow: 5px 5px 0 var(--ink); }
+  .title { font-size: 28px; }
+  .sub { font-size: 13px; margin: 6px 0 18px; }
+  .form { gap: 14px; }
+}
+
 .back {
   position: absolute;
   top: 16px;

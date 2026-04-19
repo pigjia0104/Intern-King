@@ -465,3 +465,46 @@
   animation: upsp 0.8s linear infinite;
 }
 @keyframes upsp { to { transform: rotate(360deg); } }
+
+@media (max-width: 720px) {
+  .ph { margin-bottom: 18px; padding-bottom: 14px; }
+  .phTitle { font-size: 32px; }
+  .profile {
+    padding: 18px;
+    gap: 16px;
+    margin-bottom: 20px;
+    border-radius: var(--r);
+  }
+  .ava { width: 88px; height: 88px; }
+  .info h2 { font-size: 16px; }
+  .stats { gap: 16px; margin-bottom: 10px; }
+  .stat b { font-size: 18px; }
+  .mbTrack { max-width: 100%; }
+  .tabs { gap: 6px; margin-bottom: 16px; }
+  .tab { padding: 8px 14px; font-size: 12.5px; }
+  .actions { gap: 10px; margin-bottom: 12px; }
+  .item, .favItem {
+    padding: 12px 14px;
+    gap: 12px;
+    border-radius: var(--r-sm);
+  }
+  .itemIcon, .favLogo { width: 40px; height: 40px; font-size: 18px; }
+  .itemTitle { font-size: 14px; }
+  .itemMeta { font-size: 11px; gap: 6px; }
+  .iconBtn { width: 32px; height: 32px; }
+  .riScore { width: 64px; }
+  .riScoreNum { font-size: 26px; }
+  .riScoreBar { width: 48px; }
+  .riQuote { font-size: 11.5px; padding: 6px 10px; }
+  .dialog { padding: 20px; border-radius: var(--r); }
+  .dialogTitle { font-size: 22px; }
+  .dropzone { padding: 24px 16px; }
+}
+
+@media (max-width: 420px) {
+  .tabCount { display: none; }
+  .itemActions { gap: 4px; }
+  /* Review history: drop the score column on very small screens, keep quote */
+  .item.riItem .riScore { flex-direction: row; width: auto; gap: 10px; }
+  .item.riItem .riScoreBar { width: 36px; }
+}
