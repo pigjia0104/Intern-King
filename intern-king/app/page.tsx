@@ -1,70 +1,101 @@
 import Link from "next/link";
 import { Mascot, MascotMini } from "@/components/brand/mascot";
+import { getLandingStats, formatCount } from "@/lib/services/stats.service";
+import { getApprovedTestimonials, type Testimonial } from "@/lib/services/testimonial.service";
 import styles from "./landing.module.css";
 
-const features = [
+const placeholderTestimonials: Testimonial[] = [
   {
-    emoji: "🏟️",
-    color: "acid",
-    title: "实习广场",
-    sub: "40+ 大厂实时岗位",
-    line: "字节、拼多、米哈游…谁家在招一眼看穿",
-    tag: "#在招",
-  },
-  {
-    emoji: "🔥",
-    color: "flame",
-    title: "AI 毒舌锐评",
-    sub: "把你简历撕得明明白白",
-    line: "比你妈还直接。不给鸡汤，只给致命伤。",
-    tag: "#撕裂度MAX",
-  },
-  {
-    emoji: "🎯",
-    color: "mint",
-    title: "精准双匹配",
-    sub: "JD × 简历 双维度",
-    line: "告诉你哪里差，差多少，要补什么。",
-    tag: "#别瞎投",
-  },
-] as const;
-
-const testimonials = [
-  {
-    name: "@卷心菜学长",
-    school: "某 985 计算机",
-    text: "被 AI 骂醒，三天改完简历，第二周拿到字节 offer。",
+    id: "ph-1",
+    name: "@第 1 号挨骂席",
+    school: "虚位以待",
+    text: "这栏等第一条真评价。先去被骂，再回来填。",
     color: "acid",
   },
   {
-    name: "@今天也想躺平",
-    school: "大三产品汪",
-    text: "毒舌锐评功能把我气笑了，然后认真改了一下午。",
+    id: "ph-2",
+    name: "@候补锐评人",
+    school: "排号 001",
+    text: "真人吐槽还没到货。可能，它在等你动手。",
     color: "mint",
   },
   {
-    name: "@Emily_设计",
-    school: "C9 设计系",
-    text: "比找学长看简历还好用，关键是不用欠人情。",
+    id: "ph-3",
+    name: "@空卡先生",
+    school: "还没挨过",
+    text: "看到空卡说明你来早了。规则：先骂后填。",
     color: "grape",
   },
   {
-    name: "@奋斗鸡崽",
-    school: "双非逆袭中",
-    text: "终于知道为啥投了 80 份全挂，原来项目描述全是废话。",
+    id: "ph-4",
+    name: "@未来毒评",
+    school: "内测席位",
+    text: "此处预留。投稿要求：得是实话。",
     color: "sky",
   },
-] as const;
-
-const tickerItems = [
-  "🔥 今日新增 12 个大厂实习岗位",
-  "🎯 已有 2,847 份简历接受过锐评",
-  "💥 平均撕裂度 78 分",
-  "🏟️ 覆盖 40+ 家公司",
-  '🥲 最毒评价："像是 ChatGPT 写的，还没 ChatGPT 写得好"',
 ];
 
-export default function LandingPage() {
+function mergeWithPlaceholders(real: Testimonial[], target = 4): Testimonial[] {
+  if (real.length >= target) return real.slice(0, target);
+  const needed = target - real.length;
+  const fillers = placeholderTestimonials.slice(0, needed).map((p, i) => ({
+    ...p,
+    id: `${p.id}-${real.length + i}`,
+  }));
+  return [...real, ...fillers];
+}
+
+function buildTicker(stats: Awaited<ReturnType<typeof getLandingStats>>) {
+  const items: string[] = [];
+  items.push(
+    stats.newCompaniesToday > 0
+      ? `🔥 今日新增 ${stats.newCompaniesToday} 个大厂实习岗位`
+      : "🔥 大厂岗位持续补充中"
+  );
+  items.push(`🎯 已有 ${formatCount(stats.reviewCount)} 份简历接受过锐评`);
+  if (stats.avgScore !== null) {
+    items.push(`💥 平均撕裂度 ${stats.avgScore} 分`);
+  }
+  items.push(`🏟️ 覆盖 ${stats.companyCount}+ 家公司`);
+  items.push('🥲 最毒评价："像是 ChatGPT 写的，还没 ChatGPT 写得好"');
+  return items;
+}
+
+export default async function LandingPage() {
+  const [stats, realTestimonials] = await Promise.all([
+    getLandingStats(),
+    getApprovedTestimonials(4),
+  ]);
+  const testimonials = mergeWithPlaceholders(realTestimonials, 4);
+  const tickerItems = buildTicker(stats);
+
+  const features = [
+    {
+      emoji: "🏟️",
+      color: "acid",
+      title: "实习广场",
+      sub: `${stats.companyCount}+ 大厂实时岗位`,
+      line: "字节、拼多多、米哈游…谁家在招一眼看穿",
+      tag: "#在招",
+    },
+    {
+      emoji: "🔥",
+      color: "flame",
+      title: "AI 毒舌锐评",
+      sub: "把你简历撕得明明白白",
+      line: "比你妈还直接。不给鸡汤，只给致命伤。",
+      tag: "#撕裂度MAX",
+    },
+    {
+      emoji: "🎯",
+      color: "mint",
+      title: "精准双匹配",
+      sub: "JD × 简历 双维度",
+      line: "告诉你哪里差，差多少，要补什么。",
+      tag: "#别瞎投",
+    },
+  ] as const;
+
   return (
     <div className={styles.landing}>
       {/* Nav */}
@@ -112,7 +143,7 @@ export default function LandingPage() {
         </div>
         <div className={styles.heroMain}>
           <div className={styles.heroEyebrow}>
-            <span className={styles.dot} /> 已有 2,847 位同学被我骂过
+            <span className={styles.dot} /> 已有 {formatCount(stats.reviewCount)} 位同学被我骂过
           </div>
           <h1 className={styles.heroTitle}>
             不做
@@ -137,17 +168,17 @@ export default function LandingPage() {
           </div>
           <div className={styles.heroStats}>
             <div>
-              <b>40+</b>
+              <b>{stats.companyCount}+</b>
               <span>大厂岗位</span>
             </div>
             <div className={styles.sep} />
             <div>
-              <b>2.8k</b>
+              <b>{formatCount(stats.reviewCount)}</b>
               <span>被锐评简历</span>
             </div>
             <div className={styles.sep} />
             <div>
-              <b>78</b>
+              <b>{stats.avgScore ?? "—"}</b>
               <span>平均撕裂度</span>
             </div>
           </div>
@@ -206,7 +237,7 @@ export default function LandingPage() {
         <div className={styles.wallGrid}>
           {testimonials.map((t, i) => (
             <div
-              key={t.name}
+              key={t.id}
               className={`${styles.tcard} ${styles[`tc_${t.color}`]}`}
               style={{ transform: `rotate(${[-1, 0.8, -0.6, 1.2][i]}deg)` }}
             >

@@ -87,3 +87,16 @@ model Review {
 
   @@index([userId])
 }
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  school    String
+  text      String   @db.Text
+  color     String
+  approved  Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([approved, order])
+}
